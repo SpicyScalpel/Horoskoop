@@ -17,7 +17,6 @@ namespace Horoskoop
         {
             InitializeComponent();
 
-            // Инициализируем элементы управления
             datePicker = new DatePicker
             {
                 Format = "D",
@@ -55,7 +54,6 @@ namespace Horoskoop
                 Padding = new Thickness(20)
             };
 
-            // Устанавливаем содержимое страницы
             Content = stackLayout;
         }
 
@@ -65,11 +63,10 @@ namespace Horoskoop
             DateTime selectedDate = e.NewDate;
             string zodiacSign = GetZodiacSign(selectedDate);
 
-            // Ваш код для получения описания и картинки по знаку зодиака
+            //Код для получения описания и картинки по знаку зодиака
             string zodiacDescription = GetZodiacDescription(zodiacSign);
             string imagePath = GetZodiacImagePath(zodiacSign);
 
-            // Обновляем отображение
             resultLabel.Text = $"Ваш знак зодиака: {zodiacSign}\nОписание: {zodiacDescription}";
             zodiacImage.Source = imagePath;
         }
@@ -166,8 +163,8 @@ namespace Horoskoop
             { "Скорпион", "С 24 октября по 21 ноября" },
             { "Стрелец", "С 22 ноября по 20 декабря" },
             { "Козерог", "С 21 декабря по 19 января" },
-            { "Водолей", "С с 20 января до 18 февраля" },
-            { "Рыбы", "С 20 февраля по 20 марта" }
+            { "Водолей", "С 20 января до 18 февраля" },
+            { "Рыбы", "С 19 февраля по 20 марта" }
         };
 
         private string GetZodiacDescription(string zodiacSign)
