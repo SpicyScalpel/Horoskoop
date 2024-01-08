@@ -8,14 +8,15 @@ namespace Horoskoop
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class KuupaevadPage : ContentPage
     {
-        // Добавляем элементы управления
         DatePicker datePicker;
         Label resultLabel;
         Image zodiacImage;
+        Button clearButton;
 
         public KuupaevadPage()
         {
             InitializeComponent();
+            this.Title = "Определение знака зодиака по дате";
 
             datePicker = new DatePicker
             {
@@ -30,7 +31,8 @@ namespace Horoskoop
                 Text = "Выберите дату",
                 FontSize = 20,
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
-                VerticalOptions = LayoutOptions.CenterAndExpand
+                VerticalOptions = LayoutOptions.CenterAndExpand,
+                HorizontalTextAlignment = TextAlignment.Center  
             };
 
             zodiacImage = new Image
@@ -43,13 +45,19 @@ namespace Horoskoop
                 WidthRequest = 350
             };
 
-            // Обработчик события изменения даты
             datePicker.DateSelected += OnDateSelected;
 
-            // Создаем макет страницы
+            clearButton = new Button
+            {
+                Text = "Очистить",
+                VerticalOptions = LayoutOptions.CenterAndExpand
+            };
+
+            clearButton.Clicked += ClearButton_Clicked;
+
             var stackLayout = new StackLayout
             {
-                Children = { datePicker, resultLabel, zodiacImage },
+                Children = { datePicker, resultLabel, zodiacImage, clearButton },
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 Padding = new Thickness(20)
             };
@@ -57,13 +65,23 @@ namespace Horoskoop
             Content = stackLayout;
         }
 
-        // Метод для определения знака зодиака по выбранной дате
+        private void ClearButton_Clicked(object sender, EventArgs e)
+        {
+            datePicker.Date = DateTime.Now;
+            resultLabel.Text = "Выберите дату";
+            SetDefaultImage();
+        }
+
+        private void SetDefaultImage()
+        {
+            zodiacImage.Source = "Resources/drawable/zodiak.jpg";
+        }
+
         private void OnDateSelected(object sender, DateChangedEventArgs e)
         {
             DateTime selectedDate = e.NewDate;
             string zodiacSign = GetZodiacSign(selectedDate);
 
-            //Код для получения описания и картинки по знаку зодиака
             string zodiacDescription = GetZodiacDescription(zodiacSign);
             string imagePath = GetZodiacImagePath(zodiacSign);
 
@@ -143,7 +161,6 @@ namespace Horoskoop
 
         private string GetZodiacImagePath(string zodiacSign)
         {
-            // Если знак зодиака не найден в словаре, возвращаем изображение по умолчанию
             if (!zodiacImages.ContainsKey(zodiacSign))
             {
                 return "Resources/drawable/zodiak.jpg";
@@ -169,7 +186,6 @@ namespace Horoskoop
 
         private string GetZodiacDescription(string zodiacSign)
         {
-            // Если знак зодиака не найден в словаре, возвращаем общее описание
             if (!zodiacDescriptions.ContainsKey(zodiacSign))
             {
                 return "Не выбран знак зодиака!";

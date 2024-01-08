@@ -11,6 +11,8 @@ namespace Horoskoop
         Editor zodiacEditor;
         Label dateLabel;
         Label descriptionLabel;
+        Image zodiacImage;
+        Button clearButton;
 
         private Dictionary<string, string> zodiacDates = new Dictionary<string, string>{
             { "Jäär", "21.03 - 20.04" },
@@ -42,70 +44,150 @@ namespace Horoskoop
             { "Kalad", "РЫБЫ\r\nЧувствительные и креативные, с богатым внутренним миром и эмпатией.\r\nЦитата: \"Рыбы в мечтах своих плывут, Океан их чувств многогранен и глубок.\"\r\nКамень: Аквамарин." }
         };
 
+        private readonly Dictionary<string, string> zodiacImages = new Dictionary<string, string> {
+            { "Jäär", "Resources/drawable/Aries.png" },
+            { "Sõnn", "Resources/drawable/Taurus.png" },
+            { "Kaksikud", "Resources/drawable/Gemini.png" },
+            { "Vähk", "Resources/drawable/Crayfish.png" },
+            { "Lõvi", "Resources/drawable/Lion.png" },
+            { "Neitsi", "Resources/drawable/Virgo.png" },
+            { "Kaalud", "Resources/drawable/Libra.png" },
+            { "Skorpion", "Resources/drawable/Scorpio.png" },
+            { "Ambur", "Resources/drawable/Sagittarius.png" },
+            { "Kaljukits", "Resources/drawable/Capricornus.png" },
+            { "Veevalaja", "Resources/drawable/Vodoley.png" },
+            { "Kalad", "Resources/drawable/Fishes.png" }
+        };
+
         public TahtkujudPage()
         {
             InitializeComponent();
+            Title = "Краткое описание вашего знака зодиака";
 
             zodiacEditor = new Editor
             {
                 Placeholder = "Введите знак зодиака с большой буквы и на эстонском",
-                VerticalOptions = LayoutOptions.StartAndExpand, // Изменено на StartAndExpand
-                Margin = new Thickness(20)
-            };
+                VerticalOptions = LayoutOptions.Start,
+                Margin = new Thickness(20),
+                HeightRequest = 70
+        };
 
             dateLabel = new Label
             {
-                Text = "Даты: ",
-                FontSize = 20,
+                FormattedText = new FormattedString
+                {
+                    Spans =
+                    {
+                        new Span
+                        {
+                            Text = "Даты: ",
+                            FontSize = 20,
+                            FontAttributes = FontAttributes.Bold
+                        }
+                    }
+                },
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
-                VerticalOptions = LayoutOptions.StartAndExpand, // Изменено на StartAndExpand
-                Margin = new Thickness(20, -10, 20, 0) // Отрицательное значение для сокращения расстояния вверх
+                VerticalOptions = LayoutOptions.Start,
+                Margin = new Thickness(20, -10, 20, 0)
             };
 
             descriptionLabel = new Label
             {
-                Text = "Описание: ",
-                FontSize = 20,
+                FormattedText = new FormattedString
+                {
+                    Spans =
+                    {
+                        new Span
+                        {
+                            Text = "Описание: ",
+                            FontSize = 20,
+                            FontAttributes = FontAttributes.Bold
+                        }
+                    }
+                },
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
-                VerticalOptions = LayoutOptions.StartAndExpand // Изменено на StartAndExpand
+                VerticalOptions = LayoutOptions.Start
+            };
+
+            zodiacImage = new Image
+            {
+                Aspect = Aspect.AspectFit,
+                HorizontalOptions = LayoutOptions.CenterAndExpand,
+                VerticalOptions = LayoutOptions.Start,
+                HeightRequest = 100, 
+                Margin = new Thickness(0, 10, 0, 0) 
             };
 
             Button showInfoButton = new Button
             {
                 Text = "Показать информацию",
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
-                VerticalOptions = LayoutOptions.StartAndExpand, // Изменено на StartAndExpand
+                VerticalOptions = LayoutOptions.Start,
                 Margin = new Thickness(20)
             };
 
             showInfoButton.Clicked += ShowInfoButton_Clicked;
 
+            clearButton = new Button
+            {
+                Text = "Очистить",
+                VerticalOptions = LayoutOptions.CenterAndExpand
+            };
+
+            clearButton.Clicked += ClearButton_Clicked;
+
             var stackLayout = new StackLayout
             {
-                Children = { zodiacEditor, showInfoButton, dateLabel, descriptionLabel },
+                Children = { zodiacEditor, showInfoButton, dateLabel, zodiacImage, descriptionLabel, clearButton },
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 Padding = new Thickness(20),
-                Spacing = 10 // Задайте значение, которое вам подходит
+                Spacing = 5
             };
 
             Content = stackLayout;
         }
 
+        private void ClearButton_Clicked(object sender, EventArgs e)
+        {
+            zodiacEditor.Text = string.Empty;
+            dateLabel.Text = "Даты: ";
+            descriptionLabel.Text = "Описание: ";
+            zodiacImage.Source = null;
+        }
+
+
         private void ShowInfoButton_Clicked(object sender, EventArgs e)
         {
-            string enteredZodiac = zodiacEditor.Text.Trim();
-
-            if (zodiacDates.ContainsKey(enteredZodiac) && zodiacDescriptions.ContainsKey(enteredZodiac))
+            if (zodiacEditor != null)
             {
-                string dates = zodiacDates[enteredZodiac];
-                string description = zodiacDescriptions[enteredZodiac];
+                string enteredZodiac = zodiacEditor.Text?.Trim();
 
-                dateLabel.Text = $"Даты: {dates}";
-                descriptionLabel.Text = $"Описание: {description}";
+                if (!string.IsNullOrWhiteSpace(enteredZodiac))
+                {
+                    if (zodiacDates.ContainsKey(enteredZodiac) && zodiacDescriptions.ContainsKey(enteredZodiac) && zodiacImages.ContainsKey(enteredZodiac))
+                    {
+                        string dates = zodiacDates[enteredZodiac];
+                        string description = zodiacDescriptions[enteredZodiac];
+                        string imagePath = zodiacImages[enteredZodiac];
+
+                        dateLabel.Text = $"Даты: {dates}";
+                        descriptionLabel.Text = $"Описание: {description}";
+                        zodiacImage.Source = imagePath;
+                    }
+                    else
+                    {
+                        DisplayAlert("Ошибка", "Знак зодиака не найден", "OK");
+                    }
+                }
+                else
+                {
+                    DisplayAlert("Предупреждение", "Введите знак зодиака перед показом информации", "OK");
+                }
             }
             else
             {
-                DisplayAlert("Ошибка", "Знак зодиака не найден", "OK");
+                // Обработка случая, когда zodiacEditor не инициализирован
+                DisplayAlert("Ошибка", "Не удалось получить доступ к полю ввода", "OK");
             }
         }
 
